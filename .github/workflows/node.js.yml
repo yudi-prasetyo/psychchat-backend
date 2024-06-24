@@ -41,5 +41,5 @@ jobs:
         FIREBASE_SERVICE_JSON: ${{ secrets.FIREBASE_SERVICE_JSON }}
       run: echo $FIREBASE_SERVICE_JSON | base64 -di > ./firebaseService.json
     - run: npm run build
-    - run: tree -d dist
+    - run: tree dist
     - run: npm run start
