@@ -46,7 +46,8 @@ class FirebaseAuthController {
                 res.status(400).json({ errors: errors.array() });
             } else {
                 // If there are no validation errors, extract the email, password, and role from the request body
-                const { email, password, role }: { email: string, password: string, role: Roles } = req.body;
+                const { email, password }: { email: string, password: string } = req.body;
+                const role = req.body.role || Roles.USER;
 
                 // Create a new user with createUserWithEmailAndPassword
                 const userCredential: any = await createUserWithEmailAndPassword(auth, email, password);

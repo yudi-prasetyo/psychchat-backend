@@ -6,5 +6,5 @@ export const userValidator = [
     body('email', 'Invalid email').isEmail(),
     body('password').exists(),
     body('password', 'Password must be at least 8 characters').isLength({ min: 8 }),
-    body('role', 'Invalid role').isIn([Roles.ADMIN, Roles.USER, Roles.PSYCHOLOGIST]),
+    body('role').optional().isIn([Roles.ADMIN, Roles.USER, Roles.PSYCHOLOGIST]),
 ]

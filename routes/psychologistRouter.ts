@@ -1,9 +1,3 @@
-/*
-TODO: 
-    - Add validator
-    - Add psychologist appointments
-*/
-
 import { Router } from 'express';
 import psychologistController from '../controller/psychologistController';
 import { psychologistValidator } from '../validator/psychologistValidator';
