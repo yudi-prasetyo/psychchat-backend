@@ -14,13 +14,15 @@ import {
     getDocs,
     query,
     where,
-    updateDoc
+    updateDoc,
+    Timestamp
 } from 'firebase/firestore';
 import { Response } from "express";
 import { CustomRequest } from '../helper/types';
 import { validationResult } from 'express-validator';
 import Psychologist from '../models/psychologistModel';
 import { Roles } from '../helper/enums';
+import Appointment from '../models/appointmentModel';
 
 const auth = getAuth();
 const db = getFirestore(firebase);
@@ -177,6 +179,38 @@ class PsychologistController {
         } catch (error) {
             // Send an error response if an error occurred
             res.status(500).json({ error: 'An error occurred while retrieving psychologist' });
+        }
+    }
+
+    async getAllApointmentsByPsychologistId(req: CustomRequest, res: Response): Promise<void> {
+        try {
+            // Get the user ID from the request object
+            const userId = req.params.userId;
+
+            // Get all documents from the 'appointments' collection where the 'psychologistId' field matches the user ID
+            const querySnapshot = await getDocs(query(collection(db, 'appointments'), where('psychologistId', '==', userId)));
+
+            // If no document is found, return a 404 error
+            if (querySnapshot.empty) {
+                res.status(404).json({ error: 'Appointments not found' });
+            }
+
+            // Extract the appointments data from the documents
+            const appointments: Appointment[] = [];
+            querySnapshot.forEach((doc) => {
+                const appointment: Appointment = {
+                    userId: doc.data().userId as string, // The user ID of the appointment
+                    psychologistId: doc.data().psychologistId as string, // The psychologist ID of the appointment
+                    dateTime: doc.data().dateTime.toDate()
+                };
+                appointments.push(appointment);
+            });
+
+            // Send a success response with the appointments data
+            res.status(200).json(appointments);
+        } catch (error) {
+            // Send an error response if an error occurred
+            res.status(500).json({ error: 'An error occurred while retrieving appointments' });
         }
     }
 }

@@ -55,7 +55,7 @@ const restrictByUserId = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
-    if (req.user.uid === req.params.userId || req.user.uid === req.body.userId) {
+    if (req.user.uid === req.params.userId || req.user.uid === req.body.userId || req.user.role === Roles.ADMIN) {
         next();
     } else {
         res.status(403).json({ error: 'This user is not permitted to perform this action' });

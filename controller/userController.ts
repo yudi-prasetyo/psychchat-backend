@@ -15,12 +15,19 @@ import {
     getFirestore,
     collection,
     addDoc,
+    getDocs,
+    query,
+    where,
+    updateDoc,
+    Timestamp
 } from 'firebase/firestore';
+import { CustomRequest } from '../helper/types';
+import Appointment from '../models/appointmentModel';
 
 const auth = getAuth();
 const db = getFirestore(firebase);
 
-class FirebaseAuthController {
+class UserController {
     /**
      * Register a new user with email and password.
      *
@@ -144,6 +151,38 @@ class FirebaseAuthController {
             res.status(500).json({ error: "Internal Server Error" });
         }
     }
+
+    async getAllApointmentsByPsychologistId(req: CustomRequest, res: Response): Promise<void> {
+        try {
+            // Get the user ID from the request object
+            const userId = req.params.userId;
+
+            // Get all documents from the 'appointments' collection where the 'userId' field matches the user ID
+            const querySnapshot = await getDocs(query(collection(db, 'appointments'), where('userId', '==', userId)));
+
+            // If no document is found, return a 404 error
+            if (querySnapshot.empty) {
+                res.status(404).json({ error: 'Appointments not found' });
+            }
+
+            // Extract the appointments data from the documents
+            const appointments: Appointment[] = [];
+            querySnapshot.forEach((doc) => {
+                const appointment: Appointment = {
+                    userId: doc.data().userId as string, // The user ID of the appointment
+                    psychologistId: doc.data().psychologistId as string, // The psychologist ID of the appointment
+                    dateTime: doc.data().dateTime.toDate()
+                };
+                appointments.push(appointment);
+            });
+
+            // Send a success response with the appointments data
+            res.status(200).json(appointments);
+        } catch (error) {
+            // Send an error response if an error occurred
+            res.status(500).json({ error: 'An error occurred while retrieving appointments' });
+        }
+    }
 }
 
-export default new FirebaseAuthController();
+export default new UserController();

@@ -20,5 +20,11 @@ router.put(
     restrictByUserId,
     psychologistController.updatePsychologist
 );
+router.get(
+    '/:userId/appointments',
+    verifyToken,
+    restrictByRole([Roles.PSYCHOLOGIST, Roles.ADMIN]),
+    restrictByUserId,
+    psychologistController.getAllApointmentsByPsychologistId)
 
 export default router;
